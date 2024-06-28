@@ -43,7 +43,7 @@ Para começar a utilizar o projeto, siga os passos abaixo para configurar o ambi
 * Certifique-se de ter o Node.js instalado na sua máquina. Você pode baixá-lo e instalá-lo a partir do [site oficial do Node.js](https://nodejs.org/pt).
 
 #### Instalação das Dependências
-* No diretório do projeto frontend, execute o seguinte comando para instalar todas as dependências listadas no package.json:
+* No diretório do projeto frontend, inicialmente execute o seguinte comando para instalar todas as dependências listadas no package.json:
 
 ```bash
 npm install
