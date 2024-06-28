@@ -1,0 +1,249 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2rem 0 0 0;
+    background-color: var(--dark-700);
+}
+
+
+.taskContainer{
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+
+    border-radius: 1rem;
+    background-color: var(--dark-900);
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+
+    hr{
+        width: 100%;
+        margin-top: 1rem;
+        border: 1px solid var(--white);
+    }
+}
+
+.searchContainer{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.search{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    input{
+        width: 100%;
+        height: 50px;
+    }
+    
+    button{
+        height: 50px;
+        width:  50px;
+        margin: 0 0 1rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.4rem;
+        border: 0;
+        border-radius: 1rem;
+        background: var(--purple-500);
+        transition: transform 0.8s;
+
+        &:hover{
+            transform: scale(1.1);
+        }
+    }
+}
+
+.options{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    select{
+        padding: 0.2rem;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        background-color: var(--dark-900);
+        color: var(--white);
+    }
+}
+
+
+.filter{
+    display: flex;
+    align-items: center;
+
+    span{
+        padding: 0 0.5rem;
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        align-items: center;
+        position: relative;
+        padding: 0.3rem;
+        border-radius: 0.3rem;
+        color: var(--black);
+        font-weight: bold;
+        
+        & + span {
+            margin-left: 1rem;
+        }
+    }
+}
+
+.tasks{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: 1rem 1rem 1rem 0;
+
+}
+
+.task{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    color: var(--white);
+    border-radius: 1rem;
+    background-color: var(--dark-700);
+
+    div{
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-between;
+
+        h2{
+            margin-bottom: 0;
+        }
+
+        hr{
+            width: 100%;
+            border: 1px solid var(--white);
+            margin-bottom: 0.6rem;
+        }
+
+        p{
+            display: flex;
+            overflow-wrap: break-word;
+            font-size: 0.8rem;
+            align-items: center;
+        }
+
+        span{
+            overflow-wrap: break-word;
+            margin-bottom: 0.5rem;
+        }
+
+    }
+    
+    .taskButtons{
+        width: 15%;
+        align-items: flex-end;
+
+        select{
+            padding: 0.2rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 0.3rem;
+            color: var(--white);
+            background-color: var(--dark-700);
+        }
+
+        .buttons{
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        button{
+            height: 25px;
+            width:  25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.2rem;
+            border: 0;
+            border-radius: 0.4rem;
+            transition: transform 0.8s;
+    
+            &:hover{
+                transform: scale(1.1);
+            }
+        }
+    }
+}
+
+.add{
+    background-color: var(--purple-500);
+    padding: 0.5rem;
+    border-radius: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover{
+        transform: scale(1.2);
+    }
+}
+
+.red{
+    background-color: var(--red-900);  
+}
+
+.yellow{
+    background-color: var(--yellow-500);
+}
+
+.green{
+    background-color: var(--green-500);
+}
+
+    
+    @media (max-width: 640px) {
+    .taskContainer{
+      width: 80%;
+      padding: 2rem 0.8rem;
+    }
+
+    .options{
+        select{
+            padding: 0.1rem;
+            border-radius: 0.5rem;
+            font-size: 80%;
+        }
+    }
+
+    .filter{
+        span{
+            gap: 2px;
+            font-size: 80%;
+            & + span {
+                margin-left: 0.1rem;
+            }
+
+        }
+    }
+  }

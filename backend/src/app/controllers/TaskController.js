@@ -15,7 +15,7 @@ class TaskController{
 
             // Verificação se os dados foram enviados corretamente:
             if(!(await schema.isValid(req.body))){
-                return res.status(400).json({erro: "Falha na Validação."});
+                return res.status(400).json({erro: "Error in Validation."});
             }
 
             // Busca os dados da tarefa no body:
@@ -32,7 +32,7 @@ class TaskController{
 
         }catch(err){
             console.error(err);
-            return res.status(500).json({ error: 'Erro ao criar Tarefa.' });
+            return res.status(501).json({ description: "Error creating task"});
         }
     }
 
@@ -47,54 +47,92 @@ class TaskController{
             
             // Verifica se a lista de tarefas está vazia:
             if (tasks.length === 0) {
-                return res.status(404).json({ message: 'Nenhuma tarefa encontrada.' });
+                return res.status(404).json({ message: 'No tasks found.' });
             }
             
             return res.json(tasks);
 
         }catch(err){
             console.error(err);
-            return res.status(500).json({ error: 'Erro ao buscar Tarefas.' });
+            return res.status(500).json({ error: 'Error finding tasks.' });
         }
     }
 
-    async search(req, res){
+    async findOne(req, res){
         try{
+            const { task_id } = req.query;
+            const task = await Task.findByPk(task_id);
 
-            // Verificação se os dados foram enviados corretamente:
-            const schema = Yup.object().shape({
-            search: Yup.string().required().min(3),
-            });
-            
-            // Verificação se os dados do usuário foram enviados corretamente:
-            if(!(await schema.isValid(req.query))){
-                return res.status(400).json({erro: "Falha na Validação."});
+            if(!task){
+                return res.status(404).json({erro: "Task not found."});
             }
+
+            return res.status(200).json(task);
+        }catch(err){
+            console.error(err);
+            return res.status(500).json({ error: 'Error updating task.' });
+        }
+    }
+
+    async search(req, res) {
+        try {
+            // Esquema de validação usando Yup
+            const schema = Yup.object().shape({
+                search: Yup.string(),
+                pendente: Yup.boolean().required(),
+                emAndamento: Yup.boolean().required(),
+                concluido: Yup.boolean().required(),
+                time: Yup.string().oneOf(['new', 'old']).required(),
+            });
+    
+            // Verificação se os dados do usuário foram enviados corretamente:
+            if (!(await schema.isValid(req.query))) {
+                return res.status(400).json({ error: 'Error in Validation.' });
+            }
+    
+            const { search = '', pendente, emAndamento, concluido, time } = req.query;
+
+            // Converte strings 'true' e 'false' para booleanos
+            const pendenteBool = pendente === 'true';
+            const emAndamentoBool = emAndamento === 'true';
+            const concluidoBool = concluido === 'true';
+
+            // Monta array de status baseado nos parâmetros recebidos
+            const statusArray = [];
+            if (pendenteBool) statusArray.push(0); 
+            if (emAndamentoBool) statusArray.push(1);
+            if (concluidoBool) statusArray.push(2);
             
-            const { search }  = req.query; 
-            
-            // Busca todas as Tasks do usuário cujo título contém a string de pesquisa:
+            if(statusArray.length <= 0){
+                return res.status(400).json({ error: 'Error in Validation.' });
+            }
+
+            // Define a condição de busca para o título
+            const titleCondition = search ? { [Op.like]: `%${search}%` } : { [Op.ne]: null };
+
+            // Define a condição de busca pelo time
+            const order = [['createdAt', time === 'new' ? 'DESC' : 'ASC']];
+    
+            // Busca todas as Tasks do usuário que atendam as condições
             const tasks = await Task.findAll({
                 where: {
                     user_id: req.userId,
-                    title: {
-                        [Op.like]: `%${search}%`
-                    }
+                    title: titleCondition,
+                    status: { [Op.in]: statusArray }
                 },
-                order: [['status', 'ASC']] // Ordena as tarefas pelo status em ordem crescente
+                order: order
             });
-            
+    
             // Verifica se a lista de tarefas está vazia:
             if (tasks.length === 0) {
-                return res.status(404).json({ message: 'Nenhuma tarefa encontrada.' });
+                return res.status(404).json({ message: 'No tasks found.' });
             }
-            
-            
+    
             return res.status(200).json(tasks);
-            
-        }catch(err){
+    
+        } catch (err) {
             console.error(err);
-            return res.status(500).json({ error: 'Erro ao buscar Tarefa(s).' });
+            return res.status(500).json({ error: 'Error finding tasks.' });
         }
     }
 
@@ -103,13 +141,13 @@ class TaskController{
             // Verificação se os dados foram enviados corretamente:
             const schema = Yup.object().shape({
                 title: Yup.string().notRequired(),
-                status: Yup.number().min(1).max(3).notRequired(),
                 desc: Yup.string().notRequired(),
+                status: Yup.number().notRequired(),
             });
             
             // Verificação se os dados do usuário foram enviados corretamente:
             if(!(await schema.isValid(req.body))){
-                return res.status(400).json({erro: "Falha na Validação."});
+                return res.status(400).json({erro: "Error in Validation."});
             }
             
             // Busca pelo Id da Tarefa
@@ -118,7 +156,7 @@ class TaskController{
             
             // Caso a Tarefa não seja Encontrada:
             if(!task){
-                return res.status(400).json({erro: "Tarefa Não Existe."});
+                return res.status(404).json({erro: "Task not found."});
             }
 
             // Atualiza a Tarefa:
@@ -127,7 +165,7 @@ class TaskController{
 
         }catch(err){
            console.error(err);
-            return res.status(500).json({ error: 'Erro ao atualizar Tarefa.' });
+            return res.status(500).json({ error: 'Error updating task.' });
         }
     }
 
@@ -140,12 +178,12 @@ class TaskController{
             
             // Caso a Tarefa não seja Encontrada:
             if(!task){
-                return res.status(400).json({erro: "Tarefa Não Existe."});
+                return res.status(404).json({erro: "Task not found."});
             }
             
             // Usuário Inválido:
             if(task.user_id !== req.userId){
-                return res.status(401).json({erro: "Usuário Inválido."});
+                return res.status(401).json({erro: "Invalid user."});
             }
             
             // Deleta a Tarefa:
@@ -153,7 +191,7 @@ class TaskController{
             return res.status(200).send();
         }catch(err){
             console.error(err);
-             return res.status(500).json({ error: 'Erro ao deletar Tarefa.' });
+             return res.status(500).json({ error: 'Error deleting task.' });
         }
     }
 }

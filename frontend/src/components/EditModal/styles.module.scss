@@ -1,0 +1,75 @@
+.container {
+    display: flex;
+    width: 600px;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+
+    h2{
+        color: var(--white);
+    }
+
+    hr{
+        border: 1px solid var(--white);
+        width: 100%;
+    }
+
+    form{
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        input{
+            width: 100%;
+        }
+
+        textarea{
+            width: 100%;
+            height: 6rem;
+        }
+    }
+  }
+
+  .topForm{
+    display: flex;
+    flex-direction: row-reverse;
+    width: 100%;
+    gap: 2rem;
+    align-items: center;
+    justify-content: center;
+
+    select{
+        padding: 0.6rem;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        background-color: var(--dark-900);
+        color: var(--white);
+    }
+  }
+  
+  .modalCloseButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 620px) {
+    .container{
+      width: 90%;
+    }
+
+    .topForm{
+        flex-direction: column;
+
+        select{
+            width: 100%;
+            margin-bottom: 0;
+        }
+    }
+  }

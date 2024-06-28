@@ -1,0 +1,21 @@
+.title{
+    font-size: 6rem;
+}
+
+.miniTitle{
+    font-size: 3rem;
+}
+
+.white{
+    color: var(--white);
+}
+
+.purple{
+    color: var(--purple-700);
+}
+
+@media (max-width: 620px) {
+    .tile{
+      font-size: 87.5%;
+    }
+  }

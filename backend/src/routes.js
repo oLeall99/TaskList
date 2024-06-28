@@ -39,16 +39,18 @@ const routes = new Router();
  *               password:
  *                 type: string
  *     responses:
- *       '201':
- *         description: Usuário criado com sucesso.
+ *       '200':
+ *         description: user created successfully.
  *       '400':
- *         description: Falha na Validação ou Email já em uso.
+ *         description: Erro in validation. / Email already in use.
+ *       '501':
+ *         description: Error creating user
  */
 routes.post('/user', UserController.store);
 
 /**
  * @swagger
- * /sessions:
+ * /session:
  *   post:
  *     summary: Autentica um usuário e inicia uma sessão.
  *     tags:
@@ -66,11 +68,13 @@ routes.post('/user', UserController.store);
  *                 type: string
  *     responses:
  *       '200':
- *         description: Sessão iniciada com sucesso.
+ *         description: Session created successfully.
  *       '400':
- *         description: Credenciais inválidas.
+ *         description: invalid credentials.
+ *       '501':
+ *         description: Error creating session.
  */
-routes.post('/sessions', SessionController.store);
+routes.post('/session', SessionController.store);
 
 // Autenticação de Token de Usuário para todas as rotas abaixo:
 routes.use(authMiddleware);
@@ -103,13 +107,34 @@ routes.use(authMiddleware);
  *                 type: string
  *     responses:
  *       '200':
- *         description: Informações do usuário atualizadas com sucesso.
+ *         description: user updated successfully.
  *       '400':
- *         description: Falha na Validação ou Email já em uso.
+ *         description: Erro in validation. / Email already in use.
  *       '401':
- *         description: Senha Incorreta.
+ *         description: Incorrect Password. / User not find.
+ *       '501':
+ *         description: Error creating user
  */
 routes.put('/user', UserController.update);
+
+/**
+ * @swagger
+ * /user:
+ *   get:
+ *     summary: Busca os dados do usuário no banco de dados.
+ *     tags:
+ *       - Usuários
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: user find.
+ *       '401':
+ *         description: User not find.
+ *       '501':
+ *         description: Error finding user
+ */
+routes.get('/user', UserController.find);
 
 /**
  * @swagger
@@ -133,11 +158,11 @@ routes.put('/user', UserController.update);
  *                 type: string
  *     responses:
  *       '200':
- *         description: Tarefa criada com sucesso.
+ *         description: task created successfully.
  *       '400':
- *         description: Falha na Validação.
+ *         description: Error in Validation.
  *       '500':
- *         description: Erro ao criar Tarefa.
+ *         description: Error creating task.
  */
 routes.post('/tasks', TaskController.store);
 
@@ -152,17 +177,42 @@ routes.post('/tasks', TaskController.store);
  *       - bearerAuth: []
  *     responses:
  *       '200':
- *         description: Lista de tarefas.  
+ *         description: List of tasks. 
  *       '404':
- *         description: Nenhuma tarefa encontrada.
+ *         description: No tasks found.
  *       '500':
- *         description: Erro ao buscar Tarefas.
+ *         description: Error finding tasks.
  */
 routes.get('/tasks', TaskController.index);
 
 /**
  * @swagger
- * /tasks/search:
+ * /task:
+ *   get:
+ *     summary: Busca uma única tarefa de acordo com o id.
+ *     tags:
+ *       - Tarefas
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: task_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         in: query
+ *     responses:
+ *       '200':
+ *         description: Task found. 
+ *       '404':
+ *         description: No task found.
+ *       '500':
+ *         description: Error finding task.
+ */
+routes.get('/task', TaskController.findOne);
+
+/**
+ * @swagger
+ * /task/search:
  *   get:
  *     summary: Busca tarefas do usuário logado pelo título.
  *     tags:
@@ -171,19 +221,31 @@ routes.get('/tasks', TaskController.index);
  *       - bearerAuth: []
  *     parameters:
  *       - name: search
+ *         required: false
+ *         schema:
+ *           type: string
+ *           minLength: 3
+ *         in: query
+ *       - name: status
  *         in: query
  *         required: true
  *         schema:
- *           type: string
+ *           type: array
+ *           items:
+ *             type: integer
+ *             enum: [0, 1, 2]
+ *       - name: time
+ *         in: query
+ *         required: true
  *     responses:
  *       '200':
- *         description: Lista de tarefas recuperada com sucesso.
+ *         description: List of tasks. 
  *       '400':
- *         description: Falha na Validação.
+ *         description: Error in Validation.
  *       '404':
- *         description: Nenhuma tarefa encontrada.
+ *         description: No tasks found.
  *       '500':
- *         description: Erro ao buscar Tarefa(s).
+ *         description: Error finding tasks.
  */
 routes.get('/tasks/search', TaskController.search);
 
@@ -217,11 +279,13 @@ routes.get('/tasks/search', TaskController.search);
  *                 type: string
  *     responses:
  *       '200':
- *         description: Tarefa atualizada com sucesso.
+ *         description: Task updated successfully.
  *       '400':
- *         description: Falha na Validação ou Tarefa não existe.
+ *         description: Error in Validation.
+ *       '404':
+ *         description: Task not found.
  *       '500':
- *         description: Erro ao atualizar Tarefa.
+ *         description: Error updating task.
  */
 routes.put('/tasks/:task_id', TaskController.update);
 
@@ -242,11 +306,13 @@ routes.put('/tasks/:task_id', TaskController.update);
  *           type: string
  *     responses:
  *       '200':
- *         description: Tarefa deletada com sucesso.
- *       '400':
- *         description: Tarefa não existe ou usuário inválido.
+ *         description: Task deleted successfully.
+ *       '401':
+ *         description: Invalid user.
+ *       '404':
+ *         description: Task not found.
  *       '500':
- *         description: Erro ao deletar Tarefa.
+ *         description: Error deleting task.
  */
 routes.delete('/tasks/:task_id', TaskController.delete);
 

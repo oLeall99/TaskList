@@ -7,7 +7,7 @@ export default async (req, res, next) => {
 
     // Verificação se exite um Header:
     if(!authHeader){
-        return res.status(401).json({ erro: 'Token Não Existe.'})
+        return res.status(401).json({ erro: 'Token Not Exist.'})
     }
 
     // Coleta do Token:
@@ -23,7 +23,7 @@ export default async (req, res, next) => {
         return next();
 
     }catch (err){
-        return res.status(401).json({ erro: 'Token Inválido.'})
+        return res.status(401).json({ erro: 'Invalid Token.'})
     }
 
     console.log(authHeader);
