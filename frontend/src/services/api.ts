@@ -7,7 +7,7 @@ export function setupAPIClient(ctx = undefined){
     let cookies = parseCookies(ctx);
 
     const api = axios.create({
-        baseURL: "http://localhost:3333", // URL da API
+        baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3333", // URL da API
         headers: {
             Authorization: `Bearer ${cookies['@taskauth.token']}`
         }
