@@ -15,6 +15,27 @@ module.exports = process.env.DATABASE_URL ? {
     underscored: true,
     underscoredAll: true,
   },
+  logging: console.log, // Habilitar logs para debug
+} : (process.env.DB_HOST && process.env.NODE_ENV === 'production') ? {
+  // Configuração manual para produção (fallback)
+  dialect: 'postgres',
+  host: process.env.DB_HOST,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT || 5432,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    }
+  },
+  define: {
+    timestamps: true,
+    underscored: true,
+    underscoredAll: true,
+  },
+  logging: console.log,
 } : {
   // Configuração para desenvolvimento
   dialect: 'postgres',
