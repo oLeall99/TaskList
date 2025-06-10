@@ -18,6 +18,50 @@ const routes = new Router();
  *       bearerFormat: JWT
  */
 
+// Health check route
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Verifica o status da API e conexão com banco de dados.
+ *     tags:
+ *       - Health Check
+ *     responses:
+ *       '200':
+ *         description: API is running and database is connected.
+ *       '500':
+ *         description: Database connection error.
+ */
+routes.get('/health', async (req, res) => {
+  try {
+    const { Sequelize } = require('sequelize');
+    const databaseConfig = require('./config/database.js');
+    
+    // Teste de conexão com o banco
+    const sequelize = new Sequelize(databaseConfig);
+    await sequelize.authenticate();
+    await sequelize.close();
+    
+    return res.status(200).json({ 
+      status: 'OK', 
+      message: 'API is running and database is connected',
+      timestamp: new Date().toISOString(),
+      env: process.env.NODE_ENV,
+      hasDB: !!process.env.DATABASE_URL
+    });
+  } catch (error) {
+    console.error('Health check failed:', error);
+    return res.status(500).json({ 
+      status: 'ERROR', 
+      message: 'Database connection failed',
+      error: error.message,
+      timestamp: new Date().toISOString(),
+      env: process.env.NODE_ENV,
+      hasDB: !!process.env.DATABASE_URL
+    });
+  }
+});
+
 /**
  * @swagger
  * /user:

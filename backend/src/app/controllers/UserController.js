@@ -4,6 +4,11 @@ import User from '../models/User';
 class UserController{
     async store(req,res){
         try{
+            console.log('=== USER CREATION START ===');
+            console.log('Request body:', req.body);
+            console.log('Environment:', process.env.NODE_ENV);
+            console.log('Database URL exists:', !!process.env.DATABASE_URL);
+            
             // Schema de verificação do body:
             const schema = Yup.object().shape({
                 name: Yup.string().required(),
@@ -11,25 +16,38 @@ class UserController{
                 password: Yup.string().required().min(6),
             });
             
+            console.log('Validating request body...');
             // Verificação se os dados do usuário foram enviados corretamente:
             if(!(await schema.isValid(req.body))){
+                console.log('Validation failed');
                 return res.status(400).json({erro: "Error in Validation."})
             }
+            console.log('Validation passed');
             
+            console.log('Checking if email exists...');
             // Verificação se já existe um usuário com o email informado:
             const userExists = await User.findOne({
                 where: { email: req.body.email },
             });
+            
             if(userExists) {
+                console.log('Email already exists');
                 return res.status(400).json({erro: "Email already in use."})
             }
+            console.log('Email is unique');
             
+            console.log('Creating user...');
             // Criação do Usuário:
-            await User.create(req.body);
+            const newUser = await User.create(req.body);
+            console.log('User created successfully:', newUser.id);
             
             return res.status(200).json({ description: "user created successfully."});
         }catch(err){
-            return res.status(501).json({ description: "Error creating user."});
+            console.error('=== USER CREATION ERROR ===');
+            console.error('Error details:', err);
+            console.error('Error message:', err.message);
+            console.error('Error stack:', err.stack);
+            return res.status(501).json({ description: "Error creating user.", error: err.message });
         }
     }
 
