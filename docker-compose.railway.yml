@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  # Backend API
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT:-10000}
+    ports:
+      - "${PORT:-10000}:${PORT:-10000}"
+    restart: unless-stopped
+
+  # Frontend Next.js  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      PORT: ${PORT:-3000}
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    restart: unless-stopped 
