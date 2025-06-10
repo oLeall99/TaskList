@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL
+  database:
+    image: postgres:15-alpine
+    container_name: tasklist-db
+    environment:
+      POSTGRES_DB: tasklist
+      POSTGRES_USER: tasklist_user
+      POSTGRES_PASSWORD: tasklist_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tasklist_user -d tasklist"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tasklist-backend
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://tasklist_user:tasklist_password@database:5432/tasklist
+      JWT_SECRET: super-secret-jwt-key-for-development
+      PORT: 10000
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "10000:10000"
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  # Frontend Next.js
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: tasklist-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:10000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data: 
