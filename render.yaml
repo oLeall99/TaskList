@@ -1,0 +1,31 @@
+services:
+  # Backend API
+  - type: web
+    name: tasklist-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd backend && yarn install && yarn build
+    startCommand: cd backend && yarn start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tasklist-database
+          property: connectionString
+      - key: FRONTEND_URL
+        value: https://your-frontend-name.vercel.app
+
+databases:
+  # PostgreSQL Database
+  - name: tasklist-database
+    region: oregon
+    plan: free
+    databaseName: tasklist
+    user: tasklist_user 
