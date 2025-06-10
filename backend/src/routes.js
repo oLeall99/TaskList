@@ -37,9 +37,23 @@ routes.get('/health', async (req, res) => {
     const { Sequelize } = require('sequelize');
     const databaseConfig = require('./config/database.js');
     
+    console.log('=== HEALTH CHECK START ===');
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+    console.log('Database config:', JSON.stringify(databaseConfig, null, 2));
+    
     // Teste de conexão com o banco
     const sequelize = new Sequelize(databaseConfig);
+    
+    console.log('Testing database connection...');
     await sequelize.authenticate();
+    console.log('Database connection successful');
+    
+    // Testar se a tabela users existe
+    const [results] = await sequelize.query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users'");
+    const userTableExists = results.length > 0;
+    console.log('Users table exists:', userTableExists);
+    
     await sequelize.close();
     
     return res.status(200).json({ 
@@ -47,17 +61,29 @@ routes.get('/health', async (req, res) => {
       message: 'API is running and database is connected',
       timestamp: new Date().toISOString(),
       env: process.env.NODE_ENV,
-      hasDB: !!process.env.DATABASE_URL
+      hasDB: !!process.env.DATABASE_URL,
+      userTableExists,
+      config: {
+        hasUseEnvVariable: !!databaseConfig.use_env_variable,
+        dialect: databaseConfig.dialect,
+        hasSSL: !!databaseConfig.dialectOptions?.ssl
+      }
     });
   } catch (error) {
-    console.error('Health check failed:', error);
+    console.error('=== HEALTH CHECK FAILED ===');
+    console.error('Error details:', error);
+    console.error('Error message:', error.message);
+    console.error('Error name:', error.name);
+    
     return res.status(500).json({ 
       status: 'ERROR', 
       message: 'Database connection failed',
       error: error.message,
+      errorType: error.name,
       timestamp: new Date().toISOString(),
       env: process.env.NODE_ENV,
-      hasDB: !!process.env.DATABASE_URL
+      hasDB: !!process.env.DATABASE_URL,
+      databaseUrl: process.env.DATABASE_URL ? 'Present (hidden)' : 'Missing'
     });
   }
 });
