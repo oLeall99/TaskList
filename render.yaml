@@ -27,5 +27,5 @@ databases:
   - name: tasklist-database
     region: oregon
     plan: free
-    databaseName: tasklist
+    databaseName: tasklist_l2ih
     user: tasklist_user 
