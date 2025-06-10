@@ -21,7 +21,7 @@ class App{
     }
 
     middlewares(){
-        // Configuração CORS para produção e desenvolvimento
+        // Configuração CORS otimizada para produção
         const corsOptions = {
             origin: function (origin, callback) {
                 // Permitir requests sem origin (mobile apps, Postman, etc.)
@@ -30,13 +30,21 @@ class App{
                 const allowedOrigins = [
                     'http://localhost:3000',
                     'http://localhost:3001',
+                    'http://localhost:10000',
                     'https://localhost:3000',
-                    process.env.FRONTEND_URL, // URL do frontend em produção
+                    process.env.FRONTEND_URL, // URL específica do frontend
                 ];
                 
-                // Em desenvolvimento, permitir qualquer origin do localhost
+                // Em desenvolvimento, permitir qualquer localhost
                 if (process.env.NODE_ENV !== 'production') {
                     if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+                        return callback(null, true);
+                    }
+                }
+                
+                // Em produção, permitir qualquer domínio .vercel.app e .onrender.com
+                if (process.env.NODE_ENV === 'production') {
+                    if (origin.includes('.vercel.app') || origin.includes('.onrender.com')) {
                         return callback(null, true);
                     }
                 }
@@ -44,12 +52,15 @@ class App{
                 if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
                     callback(null, true);
                 } else {
+                    console.log('CORS blocked origin:', origin);
                     callback(new Error('Não permitido pelo CORS'));
                 }
             },
             credentials: true,
-            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-            allowedHeaders: ['Content-Type', 'Authorization']
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+            allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+            exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+            maxAge: 86400 // 24 horas
         };
 
         this.server.use(cors(corsOptions));
