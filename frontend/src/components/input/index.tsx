@@ -11,8 +11,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
     );
 });
 
+Input.displayName = 'Input';
+
 export const TextArea = forwardRef<HTMLTextAreaElement, TextareaProps>((props, ref) => {
     return (
         <textarea className={styles.input} ref={ref} {...props}></textarea>
     );
 });
+
+TextArea.displayName = 'TextArea';
